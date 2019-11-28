@@ -25,8 +25,6 @@ public class Command {
             .append(" ")
             .append(PathBuilder.getPathFile(param));
 
-        System.out.println(command.toString());
-
         return this;
         
     }
@@ -46,8 +44,6 @@ public class Command {
 
             params.forEach(command::append);
 
-            System.out.println(command.toString());
-
         return this;
         
     }
@@ -57,20 +53,21 @@ public class Command {
         return this;
     }
 
-    public Boolean execute(){
+    public String execute(){
         if(OS.isWindows()){
             try{
                 Process process = Runtime.getRuntime().exec(command.toString());
-                logOutput(process.getInputStream(), "");
-                logOutput(process.getErrorStream(), "Error: ");
-                process.waitFor();
-                return true;
+                
+                Scanner scanner = new Scanner(process.getInputStream(), "UTF-8");
+                String response = scanner.nextLine();
+                scanner.close();
+                return response;
             }catch(Throwable th){
                 th.getStackTrace();
-                return false;
+                return th.getStackTrace().toString();
             }
         }
-        return false;
+        return "Seu sistema operacional não possui comando registrado no serviço";
     }
 
     private void logOutput(InputStream inputStream, String prefix) {
